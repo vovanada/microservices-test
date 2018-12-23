@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package port;
+
+service PortDomainService {
+    rpc SavePort (SavePortRequest) returns (SavePortResponse) {}
+    rpc GetPorts (GetPortsRequest) returns (GetPortsResponse) {}
+}
+
+message SavePortRequest {
+    Port Item = 1;
+}
+
+message SavePortResponse {}
+
+message GetPortsRequest {
+    int64 Page  = 1;
+    int64 Limit = 2;
+}
+
+message GetPortsResponse {
+    repeated Port Items = 1;
+    int64 Total         = 2;
+}
+
+message Port {
+    string PortID                = 1;
+    string Name                  = 2;
+    string Code                  = 3;
+    repeated string  Alias       = 4;
+    repeated string  Unlocs      = 5;
+    string Country               = 6;
+    repeated string  Regions     = 7;
+    string Province              = 8;
+    string City                  = 9;
+    repeated float Coordinates   = 10;
+    string Timezone              = 11;
+}
+
+enum PortDomainServiceErrorCode {
+    Unknown         = 0;
+    Internal        = 5000;
+    InvalidRequest  = 4000;
+}

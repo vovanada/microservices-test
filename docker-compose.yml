@@ -1,0 +1,47 @@
+version: '3'
+
+volumes:
+  port_mongo_data:
+    external: true
+
+services:
+  port-gateway:
+    image: golang:latest
+    volumes:
+      - .:/go/src/github.com/vovanada/microservices-test/
+    working_dir: /go/src/github.com/vovanada/microservices-test/
+    environment:
+      - GO111MODULE=on
+      - SERVICE_PORT_ADDR=port-service:9999
+    ports:
+      - "8888:8888"
+    command: go run ./entry/main.go --kind=port-gateway --addr=:8888
+
+  port-service:
+    image: golang:latest
+    volumes:
+      - .:/go/src/github.com/vovanada/microservices-test/
+    working_dir: /go/src/github.com/vovanada/microservices-test/
+    environment:
+      - GO111MODULE=on
+      - MONGO_URL=mongo:27017
+    command: go run ./entry/main.go --kind=port-service --addr=:9999
+    restart: always
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    logging:
+      driver: none
+    ports:
+      - "27027:27017"
+    volumes:
+      - port_mongo_data:/data/db
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8889:8080"
+    environment:
+      API_URL: http://localhost:8888/apidocs.json
